@@ -1,9 +1,12 @@
-from app import app, db, bcrypt
+from app import app, db, bcrypt, login_manager, UserManagement
 from flask import render_template, request, redirect, url_for, session, flash
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
     if request.method == "POST":
         fname = request.form["fname"]
         lname = request.form["lname"]
@@ -28,11 +31,33 @@ def register():
             return redirect(url_for('register'))
     return render_template('register.html')
 
-@app.route('/login')
+@login_manager.user_loader
+def load_user(user_id):
+    return UserManagement(user_id)
+
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        uid = db.users.get_user_id(username)
+        if uid == 0:
+            flash(' مطمئن هستید قبلا ثبت نام کردید؟', 'warning')
+            return redirect(url_for('login'))
+        user = db.users.get_user(uid)
+        if bcrypt.check_password_hash(user["password"], password):
+            login_user(UserManagement(uid), remember=True)
+            db.users.update_user_last_login(uid)
+            return redirect(url_for('home'))
+        else:
+            flash('رمزعبور صحیح نیست!!', 'danger')
+            return redirect(url_for('login'))
     return render_template('login.html')
 
 @app.route('/')
+@login_required
 def home():
     return render_template('layout.html')
 

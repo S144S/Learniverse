@@ -2,12 +2,12 @@ import json
 import sqlite3
 from datetime import datetime
 
-# from flask_login import UserMixin
+from flask_login import UserMixin
 
 
-# class UserManagement(UserMixin):
-#     def __init__(self, user_id):
-#         self.id = user_id
+class UserManagement(UserMixin):
+    def __init__(self, user_id):
+        self.id = user_id
 
 
 class Users:
