@@ -32,40 +32,49 @@
                     <div class="row justify-content-center">
                         <div class="col-lg-6 col-md-10">
                             <div class="contact__form-wrap">
+                                {% with messages = get_flashed_messages(with_categories=True) %}
+                                    {% if messages %}
+                                        {% for category, message in messages %}
+                                            <div class="alert alert-{{ category }}">
+                                                <p class="text-dark">{{ message }}</p>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endwith %}
                                 <form action="{{ url_for('register') }}" method="POST">
                                     <div class="row">
                                         <div class="col-sm-6">
                                             <div class="input-grp">
-                                                <input name="fname" placeholder="نام *" required="" type="text" />
+                                                <input name="fname" placeholder="نام *" type="text" />
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="input-grp">
-                                                <input name="lname" placeholder="نام خانوادگی *" required="" type="text" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-6">
-                                            <div class="input-grp">
-                                                <input name="username" placeholder="نام کاربری *" required="" type="text" />
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="input-grp">
-                                                <input name="grade" placeholder="پایه تحصیلی *" required="" type="number" min="7" max="9"/>
+                                                <input name="lname" placeholder="نام خانوادگی *" type="text" />
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-sm-6">
                                             <div class="input-grp">
-                                                <input name="password" placeholder="گذرواژه *" required="" type="password" />
+                                                <input name="username" placeholder="نام کاربری *" type="text" />
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="input-grp">
-                                                <input name="reppass" placeholder="تکرار گذرواژه *" required="" type="password" />
+                                                <input name="grade" placeholder="پایه تحصیلی *" type="number" min="7" max="9"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="input-grp">
+                                                <input name="password" placeholder="گذرواژه *" type="password" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="input-grp">
+                                                <input name="reppass" placeholder="تکرار گذرواژه *" type="password" />
                                             </div>
                                         </div>
                                     </div>
