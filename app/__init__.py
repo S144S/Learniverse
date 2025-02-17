@@ -1,7 +1,8 @@
 from flask import Flask
 from flask_bcrypt import Bcrypt
-from .db_helper import DBHelper, UserManagement
 from flask_login import LoginManager
+
+from .db_helper import DBHelper, UserManagement
 
 app = Flask(__name__)
 app.secret_key = "super_secret_key"

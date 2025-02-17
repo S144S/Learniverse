@@ -1,6 +1,7 @@
-from app import app, db, bcrypt, login_manager, UserManagement
-from flask import render_template, request, redirect, url_for, session, flash
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask import flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_required, login_user, logout_user
+
+from app import UserManagement, app, bcrypt, db, login_manager
 
 
 @app.route('/register', methods=["GET", "POST"])
@@ -44,7 +45,7 @@ def login():
         password = request.form["password"]
         uid = db.users.get_user_id(username)
         if uid == 0:
-            flash(' مطمئن هستید قبلا ثبت نام کردید؟', 'warning')
+            flash(' مطمئن هستی قبلا ثبت نام کردی؟!', 'warning')
             return redirect(url_for('login'))
         user = db.users.get_user(uid)
         if bcrypt.check_password_hash(user["password"], password):
@@ -55,6 +56,11 @@ def login():
             flash('رمزعبور صحیح نیست!!', 'danger')
             return redirect(url_for('login'))
     return render_template('login.html')
+
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 @app.route('/')
 @login_required
