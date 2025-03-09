@@ -87,7 +87,7 @@ def galaxy():
 
 @app.route('/mission')
 def mission():
-    return render_template('mission.html')
+    return render_template('puzzle.html')
 
 # @app.route('/planet')
 # def planet():

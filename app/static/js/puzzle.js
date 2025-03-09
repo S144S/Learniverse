@@ -10,74 +10,62 @@ const restart = document.getElementById('restart');
 const imagesLinkArray = [
     {
         id: 1,
-        image: 
-'https://media.geeksforgeeks.org/wp-content/uploads/20231122102833/AngularImage.png',
+        image: 'https://media.geeksforgeeks.org/wp-content/uploads/20231122102833/AngularImage.png',
         newAlt: 'Angular Image'
     },
     {
         id: 2,
-        image: 
-'https://media.geeksforgeeks.org/wp-content/uploads/20231122102835/html5Image.png',
+        image: 'https://media.geeksforgeeks.org/wp-content/uploads/20231122102835/html5Image.png',
         newAlt: 'HTML Image'
     },
     {
         id: 3,
-        image: 
-'https://media.geeksforgeeks.org/wp-content/uploads/20231122102834/JSImage.jpg',
+        image: 'https://media.geeksforgeeks.org/wp-content/uploads/20231122102834/JSImage.jpg',
         newAlt: 'JavaScript Image'
     },
     {
         id: 4,
-        image: 
-'https://media.geeksforgeeks.org/wp-content/uploads/20231122102833/reactImage.png',
+        image: 'https://media.geeksforgeeks.org/wp-content/uploads/20231122102833/reactImage.png',
         newAlt: 'React Image'
     },
     {
         id: 5,
-        image: 
-'https://media.geeksforgeeks.org/wp-content/uploads/20231122102833/vueImage.png',
+        image: 'https://media.geeksforgeeks.org/wp-content/uploads/20231122102833/vueImage.png',
         newAlt: 'Vue Image'
     },
     {
         id: 6,
-        image: 
-'https://media.geeksforgeeks.org/wp-content/uploads/20231122102834/JSImage.jpg',
+        image: 'https://media.geeksforgeeks.org/wp-content/uploads/20231122102834/JSImage.jpg',
         newAlt: 'JavaScript Image'
     },
     {
         id: 7,
-        image: 
-'https://media.geeksforgeeks.org/wp-content/uploads/20231122102833/vueImage.png',
+        image: 'https://media.geeksforgeeks.org/wp-content/uploads/20231122102833/vueImage.png',
         newAlt: 'Vue Image'
     },
     {
         id: 8,
-        image: 
-'https://media.geeksforgeeks.org/wp-content/uploads/20231122102835/html5Image.png',
+        image: 'https://media.geeksforgeeks.org/wp-content/uploads/20231122102835/html5Image.png',
         newAlt: 'HTML Image'
     },
     {
         id: 9,
-        image: 
-'https://media.geeksforgeeks.org/wp-content/uploads/20231122102834/CSS3Image.png',
+        image: 'https://media.geeksforgeeks.org/wp-content/uploads/20231122102834/CSS3Image.png',
         newAlt: 'CSS Image'
     },
     {
         id: 10,
-        image: 
-'https://media.geeksforgeeks.org/wp-content/uploads/20231122102833/AngularImage.png',
+        image: 'https://media.geeksforgeeks.org/wp-content/uploads/20231122102833/AngularImage.png',
         newAlt: 'Angular Image'
     },
     {
         id: 11,
-        image: 
-'https://media.geeksforgeeks.org/wp-content/uploads/20231122102834/CSS3Image.png',
+        image: 'https://media.geeksforgeeks.org/wp-content/uploads/20231122102834/CSS3Image.png',
         newAlt: 'CSS Image'
     },
     {
         id: 12,
-        image: 
-'https://media.geeksforgeeks.org/wp-content/uploads/20231122102833/reactImage.png',
+        image: 'https://media.geeksforgeeks.org/wp-content/uploads/20231122102833/reactImage.png',
         newAlt: 'React Image'
     }
 ]
@@ -103,7 +91,7 @@ const restartGame = () => {
         el.id = imagesLinkArray[index].id
     }) 
 }
-restart.addEventListener('click', restartGame);
+// restart.addEventListener('click', restartGame);
 
 //checking for the last clicked and current 
 //clicked cards and applying changes accordingly
