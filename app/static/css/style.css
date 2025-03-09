@@ -7,3 +7,131 @@
     opacity: 0.1 !important;
     /* transition: opacity 0.3s ease-in-out; */
 }
+
+.game-container {
+    display: flex;
+    justify-content: center; /* Centers content horizontally */
+    align-items: center; /* Centers content vertically */
+    flex-direction: column; /* Stack heading, cards, and progress */
+    width: 100%;
+    height: 100vh; /* Full viewport height */
+    padding: 20px;
+    border-radius: 10px;
+    row-gap: 15px;
+    margin-top: 25px;
+}
+
+.game-cards-container {
+    margin-top: 40px;
+    display: grid;
+    grid-template-rows: repeat(3, 125px); /* 3 rows, each 125px in height */
+    grid-template-columns: repeat(4, 200px); /* 4 columns, each 200px in width */
+    grid-gap: 20px 10px;
+    justify-items: center; /* Center items horizontally inside each grid cell */
+    align-items: center; /* Center items vertically inside each grid cell */
+}
+
+.game-heading-container {
+    text-align: center;
+}
+
+.gfg-heading {
+    color: #0E9D57;
+}
+
+.game-card {
+    justify-items: center;
+    display: flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+}
+
+.outline-image {
+    position: absolute;
+    border-radius: 10px;
+    top: 0;
+    left: 0;
+    height: 125px;
+    width: 125px;
+    border-radius: 50%;
+}
+
+.card-image {
+    height: 125px;
+    width: 125px;
+    transform: rotateY(90deg); 
+    transition: all ease-in 0.25s;
+    mix-blend-mode: multiply;
+}
+
+.progress-container {
+    text-align: center;
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin: 50px 0 20px 0;
+}
+
+.move-counter {
+    padding: 10px 20px;
+    border-radius: 25px;
+    border: 1px solid #ccc;
+}
+
+.restart-button {
+    padding: 10px 20px;
+    background-color: #0E9D57;
+    border: none;
+    border-radius: 25px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.restart-button:hover {
+    background-color: transparent;
+    border: 1px solid #0E9D57;
+    color: #0E9D57;
+}
+
+/* Dynamic classes that are being added by JavaScript */
+.toggled .card-image { 
+    transform: rotateY(0deg); 
+    transition-delay: 0.25s; 
+} 
+
+.item .outline-image { 
+    transition: all ease-in 0.25s; 
+    transition-delay: 0.25s; 
+} 
+  
+.toggled .outline-image { 
+    transform: rotateY(90deg); 
+    transition-delay: 0s; 
+}
+
+@media screen and (max-width: 767px) {
+    .game-container{
+        width: 100%;
+    }
+    
+    .game-cards-container{
+        grid-template-rows: repeat(4, 125px);
+        grid-template-columns: repeat(3, 33%);
+        grid-gap: 10px 10px;
+    }
+
+    .outline-image{
+        height: 100px;
+        width: 100px;
+    }
+    
+    .card-image{
+        height: 100px;
+        width: 100px;
+    }
+
+    .progress-container{
+        margin: 10px 0 10px 0;
+    }
+}

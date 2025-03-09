@@ -85,9 +85,9 @@ def galaxy():
     }
     return render_template('galaxy.html', planet_info=planet_info)
 
-# @app.route('/mission')
-# def mission():
-#     return render_template('mission.html')
+@app.route('/mission')
+def mission():
+    return render_template('mission.html')
 
 # @app.route('/planet')
 # def planet():
