@@ -1,0 +1,67 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+<title>کهکشان</title>
+{% endblock %}
+
+{% block content %}
+<section class="match__result-area">
+    <div class="match__result-bg" data-background="{{ url_for('static', filename='img/bg/result_bg.png') }}"></div>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-6 col-lg-7 col-md-10">
+                <div  class="section__title text-center mb-55">
+                    <h3 style="text-align: center;" class="title">کهکشان من</h3>
+                </div>
+            </div>
+        </div>
+        <div class="row match__result-wrapper justify-content-center">
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <a href="#"><img alt="img" class="img-fluid rounded fade-img" src="{{ url_for('static', filename='img/galaxy/sun.png') }}" /></a>
+                <a href="#"><img alt="img" class="img-fluid rounded fade-img" src="{{ url_for('static', filename='img/galaxy/mercury.png') }}" /></a>
+                <a href="#"><img alt="img" class="img-fluid rounded fade-img" src="{{ url_for('static', filename='img/galaxy/venus.png') }}" /></a>
+                <a href="#"><img alt="img" class="img-fluid rounded" src="{{ url_for('static', filename='img/galaxy/earth.png') }}" /></a>
+            </div>
+            
+        </div>
+        
+    </div>
+</section>
+<div class="area-background" data-background="{{ url_for('static', filename='img/bg/area_bg02.jpg') }}">
+    <section class="about__area-two section-pt-160 section-pb-190">
+        <div class="container">
+            <div class="row justify-content-center align-items-center">
+                <div class="col-xl-6 col-lg-6 order-0 order-lg-2">
+                    <div class="about__funFact-images">
+                        <img alt="background" class="bg-shape" src="{{ url_for('static', filename='img/others/fun_fact_shape.png') }}" />
+                        <img alt="image" class="main-img" src="{{ url_for('static', filename='img/galaxy/' + planet_info['img']) }}" />
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-md-10">
+                    <div class="section__title text-start mb-30">
+                        <h3 class="title">{{ planet_info['name'] }}</h3>
+                    </div>
+                    <div class="about__content-two">
+                        <p>{{ planet_info['desc'] }}</p>
+                    </div>
+                    <div class="about__content-bottom">
+                        <div class="about__content-circle"><img alt="img" src="{{ url_for('static', filename='img/icons/circle.svg') }}" /><svg
+                                version="1.1" viewbox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M 0,75 a 75,75 0 1,1 0,1 z" id="textPath"></path><text>
+                                    <textpath href="#textPath">بازی Super NFT در حال نشستن است</textpath>
+                                </text>
+                            </svg></div>
+                        <div class="about__funFact-wrap">
+                            <div class="about__content-btns"><a class="tg-btn-3 tg-svg" href="#">
+                                    <div class="svg-icon" data-svg-icon="{{ url_for('static', filename='img/icons/shape.svg') }}" id="svg-6">
+                                    </div><span>فتح {{ planet_info['name'] }}</span>
+                                </a>
+                                <a class="popup-video" href="{{ planet_info['video'] }}"><i class="fas fa-play"></i><span class="text">با {{ planet_info['name'] }} بیشتر آشنا بشید</span></a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

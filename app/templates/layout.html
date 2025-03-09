@@ -13,6 +13,7 @@
         <!-- CSS here -->
         <link rel="stylesheet" href="{{ url_for('static', filename='css/plugins.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
         <!-- Page-Revealer -->
         <script src="{{ url_for('static', filename='js/tg-page-head.js') }}"></script>
@@ -40,7 +41,7 @@
                                     <div class="tgmenu__navbar-wrap tgmenu__main-menu d-none d-xl-flex">
                                         <ul class="navigation">
                                             <li><a href="{{ url_for('home') }}">خانه</a></li>
-                                            <li><a href="#">کهکشان من</a></li>
+                                            <li><a href="{{ url_for('galaxy') }}">کهکشان من</a></li>
                                             <li><a href="#">سفینه من</a></li>
                                             <li><a href="#">درباره‌ی ما</a></li>
                                             <li><a href="#">پشتیبانی</a></li>

@@ -1,3 +1,9 @@
 .min-height-100 {
     min-height: 100px !important;
 }
+
+
+.fade-img {
+    opacity: 0.1 !important;
+    /* transition: opacity 0.3s ease-in-out; */
+}
