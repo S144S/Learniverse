@@ -42,9 +42,9 @@
                                         <ul class="navigation">
                                             <li><a href="{{ url_for('home') }}">خانه</a></li>
                                             <li><a href="{{ url_for('galaxy') }}">کهکشان من</a></li>
-                                            <li><a href="#">سفینه من</a></li>
-                                            <li><a href="#">درباره‌ی ما</a></li>
-                                            <li><a href="#">پشتیبانی</a></li>
+                                            <li><a href="{{ url_for('my_rocket') }}">سفینه من</a></li>
+                                            <li><a href="{{ url_for('about') }}">درباره‌ی ما</a></li>
+                                            <li><a href="{{ url_for('contact') }}#">پشتیبانی</a></li>
                                             <li><a href="{{ url_for('logout') }}">خروج</a></li>
                                         </ul>
                                     </div>

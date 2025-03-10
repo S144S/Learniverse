@@ -95,7 +95,6 @@ def mission():
         return redirect(url_for('exam'))
     # You might want to add logic for when the puzzle is solved or the test is completed.
 
-
 @app.route('/puzzle')
 def puzzle():
     gift_content = 'مولکول سازنده چیز هاست'
@@ -127,3 +126,15 @@ def check_exam():
     score = sum(1 for q, ans in data.items() if correct_answers.get(q) == int(ans))
     
     return jsonify({"score": score})
+
+@app.route('/my-rocket')
+def my_rocket():
+    return render_template('my_rocket.html')
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
