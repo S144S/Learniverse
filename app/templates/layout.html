@@ -44,7 +44,7 @@
                                             <li><a href="{{ url_for('galaxy') }}">کهکشان من</a></li>
                                             <li><a href="{{ url_for('my_rocket') }}">سفینه من</a></li>
                                             <li><a href="{{ url_for('about') }}">درباره‌ی ما</a></li>
-                                            <li><a href="{{ url_for('contact') }}#">پشتیبانی</a></li>
+                                            <li><a href="{{ url_for('contact') }}">پشتیبانی</a></li>
                                             <li><a href="{{ url_for('logout') }}">خروج</a></li>
                                         </ul>
                                     </div>
@@ -169,8 +169,8 @@
                             <div class="footer-widget widget_nav_menu">
                                 <h4 class="fw-title">دسترسی سریع</h4>
                                 <ul class="list-wrap menu">
-                                    <li><a href="#">درباره ما</a></li>
-                                    <li><a href="#">24/7 پشتیبانی </a></li>
+                                    <li><a href="{{ url_for('about') }}">درباره ما</a></li>
+                                    <li><a href="{{ url_for('contact') }}">24/7 پشتیبانی </a></li>
                                 </ul>
                             </div>
                         </div>
