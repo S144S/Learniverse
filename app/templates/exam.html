@@ -1,0 +1,91 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+<title>کهکشان</title>
+{% endblock %}
+
+{% block content %}
+<section class="match__result-area">
+    <form id="quiz-form">
+        {% for i in range(1, 11) %}
+        <div class="">
+            <div class="card-body">
+                <h5 class="card-title">سوال {{ i }}:</h5>
+                <p class="card-text">{{ questions[i-1]['question'] }}</p>
+                
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="q{{ i }}" value="1">
+                    <label class="form-check-label">{{ questions[i-1]['options'][0] }}</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="q{{ i }}" value="2">
+                    <label class="form-check-label">{{ questions[i-1]['options'][1] }}</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="q{{ i }}" value="3">
+                    <label class="form-check-label">{{ questions[i-1]['options'][2] }}</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="q{{ i }}" value="4">
+                    <label class="form-check-label">{{ questions[i-1]['options'][3] }}</label>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary w-100">ارسال پاسخ‌ها</button>
+    </form>
+</section>
+
+<!-- Modal for Success -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-dark">تبریک 🎉</h5>
+            </div>
+            <div class="modal-body text-dark">
+                <p>شما بیش از ۵ سوال را درست پاسخ دادید! آفرین!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">ادامه</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById("quiz-form").addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevent form submission
+    
+    let answers = {};
+    document.querySelectorAll("input[type='radio']:checked").forEach(input => {
+        answers[input.name] = input.value;
+    });
+
+    fetch("/check_exam", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(answers)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.score > 5) {
+            var successModal = new bootstrap.Modal(document.getElementById("successModal"));
+            successModal.show();
+        } else {
+            alert("امتحان تمام شد! نمره شما: " + data.score);
+        }
+    });
+});
+</script>
+{% endblock %}
+
+
+
+{% block js %}
+<!-- <script src="{{ url_for('static', filename='js/puzzle.js') }}"></script> -->
+{% endblock %}

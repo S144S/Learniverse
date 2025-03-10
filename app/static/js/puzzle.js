@@ -83,7 +83,7 @@ const restartGame = () => {
     toggledCardsArray.length = 0;
     move = 0;
     winCount=0;
-    movesDisplay.innerText = `Moves: ${move}`;
+    movesDisplay.innerText = `تعداد حرکات: ${move}`;
     let allImagesSrc = document.getElementsByClassName('card-image');
     Object.values(allImagesSrc).forEach((el, index)=>{
         el.src = imagesLinkArray[index].image;
@@ -99,28 +99,45 @@ for (var i = 0; i < cards.length; i++) {
     cards[i].addEventListener('click', function () {
         this.classList.add("toggled");
         toggledCardsArray.push(this);
+
+        // If it's the first card clicked, return early
+        if (toggledCardsArray.length < 2) {
+            return;
+        }
+
         let thisImgSrc = this.querySelector('.card-image').src;
-        let previousImgSrc = 
-        toggledCardsArray[toggledCardsArray.length - 2].querySelector('.card-image').src;
-        if(thisImgSrc !== previousImgSrc) {
+        let previousCard = toggledCardsArray[toggledCardsArray.length - 2];
+
+        if (!previousCard) return; // Prevent the error
+
+        let previousImgSrc = previousCard.querySelector('.card-image').src;
+
+        if (thisImgSrc !== previousImgSrc) {
             toggledCardsArray.forEach(function (el) {
                 setTimeout(() => {
                     el.classList.remove("toggled");
                 }, 500);
-            })
+            });
             toggledCardsArray.length = 0;
             move++;
-        }
-        else{
+        } else {
             toggledCardsArray.length = 0;
             move++;
             winCount++;
         }
-        movesDisplay.innerText = `Moves: ${move}`;
-        if(winCount===6){
-            setTimeout(()=>{
-                alert(`Congratulations!!! You won the game in ${move} moves.`)
-            }, 300)
+
+        movesDisplay.innerText = `تعداد حرکات: ${move}`;
+
+        // Show the modal when the player wins
+        if (winCount === 6) {
+            setTimeout(() => {
+                document.getElementById('moveCount').innerText = move;
+                let winModal = new bootstrap.Modal(document.getElementById('gameModal'), {
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                winModal.show(); // Show the modal
+            }, 300);
         }
-    })
+    });
 }

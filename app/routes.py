@@ -1,4 +1,4 @@
-from flask import flash, redirect, render_template, request, url_for
+from flask import flash, redirect, render_template, request, url_for, jsonify
 from flask_login import current_user, login_required, login_user, logout_user
 
 from app import UserManagement, app, bcrypt, db, login_manager
@@ -87,8 +87,43 @@ def galaxy():
 
 @app.route('/mission')
 def mission():
-    return render_template('puzzle.html')
+    is_solve_puzzle = False
+    is_solve_test = False
+    if not is_solve_puzzle:
+        return redirect(url_for('puzzle'))
+    else:
+        return redirect(url_for('exam'))
+    # You might want to add logic for when the puzzle is solved or the test is completed.
 
-# @app.route('/planet')
-# def planet():
-#     return render_template('planet.html')
+
+@app.route('/puzzle')
+def puzzle():
+    gift_content = 'مولکول سازنده چیز هاست'
+    return render_template('puzzle.html', gift_content=gift_content)
+
+@app.route('/exam')
+def exam():
+    questions = [
+        {"question": "پایتون چیست؟", "options": ["یک زبان برنامه‌نویسی", "یک حیوان", "یک ماشین حساب", "یک سیستم‌عامل"]},
+        {"question": "چه سالی پایتون معرفی شد؟", "options": ["۱۹۸۹", "۱۹۹۵", "۲۰۰۰", "۲۰۱۰"]},
+        {"question": "چه سالی پایتون معرفی شد؟", "options": ["۱۹۸۹", "۱۹۹۵", "۲۰۰۰", "۲۰۱۰"]},
+        {"question": "چه سالی پایتون معرفی شد؟", "options": ["۱۹۸۹", "۱۹۹۵", "۲۰۰۰", "۲۰۱۰"]},
+        {"question": "چه سالی پایتون معرفی شد؟", "options": ["۱۹۸۹", "۱۹۹۵", "۲۰۰۰", "۲۰۱۰"]},
+        {"question": "چه سالی پایتون معرفی شد؟", "options": ["۱۹۸۹", "۱۹۹۵", "۲۰۰۰", "۲۰۱۰"]},
+        {"question": "چه سالی پایتون معرفی شد؟", "options": ["۱۹۸۹", "۱۹۹۵", "۲۰۰۰", "۲۰۱۰"]},
+        {"question": "چه سالی پایتون معرفی شد؟", "options": ["۱۹۸۹", "۱۹۹۵", "۲۰۰۰", "۲۰۱۰"]},
+        {"question": "چه سالی پایتون معرفی شد؟", "options": ["۱۹۸۹", "۱۹۹۵", "۲۰۰۰", "۲۰۱۰"]},
+        {"question": "چه سالی پایتون معرفی شد؟", "options": ["۱۹۸۹", "۱۹۹۵", "۲۰۰۰", "۲۰۱۰"]},
+    ]
+    return render_template('exam.html', questions=questions)
+
+@app.route('/check_exam', methods=['POST'])
+def check_exam():
+    correct_answers = {
+        "q1": 1, "q2": 3, "q3": 2, "q4": 4, "q5": 1,
+        "q6": 2, "q7": 3, "q8": 1, "q9": 4, "q10": 2
+    }
+    data = request.json  # Get submitted answers from frontend
+    score = sum(1 for q, ans in data.items() if correct_answers.get(q) == int(ans))
+    
+    return jsonify({"score": score})
