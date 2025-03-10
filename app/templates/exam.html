@@ -41,7 +41,7 @@
         </div>
         <div class="d-flex justify-content-center">
             <button type="submit" class="btn btn-primary">ارسال پاسخ‌ها</button>
-            <button class="btn btn-secondary me-2">خرید جزوه</button>
+            <button type="button" class="btn btn-secondary me-2" id="buyDoc">خرید جزوه با 30 سکه!</button>
         </div>
         
         
@@ -57,44 +57,62 @@
                 <h5 class="modal-title text-dark">تبریک 🎉</h5>
             </div>
             <div class="modal-body text-dark">
-                <p>شما بیش از ۵ سوال را درست پاسخ دادید! آفرین!</p>
+                <p>
+                    تو موفق شدی این سیاره رو فتحی کنی! حالا کمربنتو ببند تا بریم سراغ سیاره بعدی.
+                    بابت فتح این سیاره 100 سکه طلا به حسابت واریز شد!
+                </p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-success" data-bs-dismiss="modal">ادامه</button>
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='{{ url_for('galaxy') }}'">
+                    بزن بریم
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-<script>
-document.getElementById("quiz-form").addEventListener("submit", function(event) {
-    event.preventDefault(); // Prevent form submission
-    
-    let answers = {};
-    document.querySelectorAll("input[type='radio']:checked").forEach(input => {
-        answers[input.name] = input.value;
-    });
+<!-- Modal for Failed -->
+<div class="modal fade" id="failedModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-dark">متاسفم!</h5>
+            </div>
+            <div class="modal-body text-dark">
+                <p>
+                    بنظر میرسه هنوز زور سفینت به این سیاره نمیرسه! یکم بیشتر تلاش کن یا اگه لازم میدونی جزوه بخر.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">متوجه شدم!</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-    fetch("/check_exam", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(answers)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.score > 5) {
-            var successModal = new bootstrap.Modal(document.getElementById("successModal"));
-            successModal.show();
-        } else {
-            alert("امتحان تمام شد! نمره شما: " + data.score);
-        }
-    });
-});
-</script>
+<!-- Modal for Buy -->
+<div class="modal fade" id="buyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-dark">وقت خرید جزوس!</h5>
+            </div>
+            <div class="modal-body text-dark">
+                <p>
+                    خرید جزوه کار عاقلانه ای بنظر میرسه و سکه کافی هم برای این کار داری، پس <a href="{{ url_for('static', filename='docs/riazi.pdf') }}" target="_blank" download>جزوه</a> رو دانلود کن و بخون.  .
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">متوجه شدم!</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 
 
 {% block js %}
-<!-- <script src="{{ url_for('static', filename='js/puzzle.js') }}"></script> -->
+<script src="{{ url_for('static', filename='js/exam.js') }}"></script>
 {% endblock %}
