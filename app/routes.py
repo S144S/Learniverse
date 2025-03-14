@@ -87,7 +87,7 @@ def galaxy():
 
 @app.route('/mission')
 def mission():
-    is_solve_puzzle = False
+    is_solve_puzzle = True
     is_solve_test = False
     if not is_solve_puzzle:
         return redirect(url_for('puzzle'))
@@ -104,6 +104,7 @@ def puzzle():
 
 @app.route('/exam')
 def exam():
+    money = 10
     questions = [
         {"question": "حاصل عبارت ۳ + ۵ × ۲ کدام است؟", "options": ["۱۶", "۱۳", "۱۰", "۸"]},
         {"question": "کدام یک عدد اول است؟", "options": ["۱۵", "۲۳", "۲۷", "۳۹"]},
@@ -116,7 +117,7 @@ def exam():
         {"question": "کدام گزینه برابر با ۴۵٪ از ۲۰۰ است؟", "options": ["۷۰", "۸۰", "۹۰", "۱۰۰"]},
         {"question": "اگر محیط یک مستطیل ۲۰ سانتی‌متر و طول آن ۶ سانتی‌متر باشد، عرض آن چقدر است؟", "options": ["۲", "۴", "۵", "۶"]},
     ]
-    return render_template('exam.html', questions=questions)
+    return render_template('exam.html', questions=questions, money=money)
 
 @app.route('/check_exam', methods=['POST'])
 def check_exam():
@@ -131,7 +132,19 @@ def check_exam():
 
 @app.route('/my-rocket')
 def my_rocket():
-    return render_template('my_rocket.html')
+    money = 350
+    cold_trip = False
+    atomic_fuel = False
+    flying_motor = False
+    titanium_body = True
+    return render_template(
+        'my_rocket.html',
+        money=money,
+        cold_trip=cold_trip,
+        atomic_fuel=atomic_fuel,
+        flying_motor=flying_motor,
+        titanium_body=titanium_body
+    )
 
 @app.route('/about')
 def about():
