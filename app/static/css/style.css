@@ -110,6 +110,10 @@
     transition-delay: 0s; 
 }
 
+.pointer-cursor {
+    cursor: pointer !important;
+}
+
 @media screen and (max-width: 767px) {
     .game-container{
         width: 100%;

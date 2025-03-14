@@ -70,6 +70,7 @@ def home():
 @app.route('/my-galaxy')
 @login_required
 def galaxy():
+    # TODO: Get below items from db.
     current_planet_name = 'زمین'
     current_planet_desc = 'زمین همون جاییه که توش زندگی می‌کنیم، سیاره‌ای پر از دریاها، کوه‌ها و جنگل‌های سرسبز که هوای مناسب برای نفس کشیدن داره. اینجا خونه‌ی میلیون‌ها موجود زنده‌ست، از ریزترین باکتری‌ها گرفته تا بزرگ‌ترین نهنگ‌ها. آدم‌ها روی زمین شهر ساختن، تکنولوژی پیشرفت دادن و مدام دارن رازهای جدیدی درباره‌ش کشف می‌کنن. با اینکه خیلی چیزا رو درباره‌ش می‌دونیم، ولی هنوز کلی ماجراجویی و کشف جدید تو دل این سیاره منتظر ماست!'
     # خورشید قلب تپنده‌ی منظومه شمسیه! یه توپ آتشین غول‌پیکر که با نور و گرماش به زمین و بقیه‌ی سیاره‌ها زندگی می‌بخشه. این ستاره‌ی داغ از گازهای هیدروژن و هلیوم ساخته شده و همیشه در حال فوران و انفجاره. بدون خورشید، روز و شب بی‌معنی می‌شدن و زمین یه سیاره‌ی یخ‌زده بود. خلاصه که این غول آتشین حسابی سرنوشت ما رو تو دستاش داره!
@@ -87,6 +88,7 @@ def galaxy():
 
 @app.route('/mission')
 def mission():
+    # TODO: Get is_solve_puzzle from db.
     is_solve_puzzle = True
     is_solve_test = False
     if not is_solve_puzzle:
@@ -96,6 +98,7 @@ def mission():
 
 @app.route('/puzzle')
 def puzzle():
+    # TODO: Get is_solve_puzzle from db.
     is_solve_puzzle = False
     if is_solve_puzzle:
         return redirect(url_for('exam'))
@@ -104,6 +107,8 @@ def puzzle():
 
 @app.route('/exam')
 def exam():
+    # TODO: Get user money and questions from db.
+    # TODO: Update is_solve_puzzle from db.
     money = 10
     questions = [
         {"question": "حاصل عبارت ۳ + ۵ × ۲ کدام است؟", "options": ["۱۶", "۱۳", "۱۰", "۸"]},
@@ -121,6 +126,7 @@ def exam():
 
 @app.route('/check_exam', methods=['POST'])
 def check_exam():
+    # TODO: Get right answers from db.
     correct_answers = {
         "q1": 1, "q2": 3, "q3": 2, "q4": 4, "q5": 1,
         "q6": 2, "q7": 3, "q8": 1, "q9": 4, "q10": 2
@@ -132,6 +138,7 @@ def check_exam():
 
 @app.route('/my-rocket')
 def my_rocket():
+    # TODO: Get below items from db.
     money = 350
     cold_trip = False
     atomic_fuel = False
@@ -145,6 +152,26 @@ def my_rocket():
         flying_motor=flying_motor,
         titanium_body=titanium_body
     )
+
+@app.route('/store')
+def store():
+    return render_template('store.html')
+
+
+@app.route('/purchase', methods=['POST'])
+def purchase():
+    # TODO: Get user money from db.
+    money = 100
+    data = request.json
+    item = data.get('item')
+    cost = int(data.get('cost', 0))
+    # TODO: Update is_cold_trip, etc on db.
+
+    if money >= cost:
+        money -= cost
+        return jsonify({'success': True, 'message': f'قابلیت {item} به سفینت اضافه شد، میتونی بعد از بستن این پیام از منوی بالا بری سفینت رو ببینی!'})
+    else:
+        return jsonify({'success': False, 'message': 'سکه کافی نداری! ❌'})
 
 @app.route('/about')
 def about():
