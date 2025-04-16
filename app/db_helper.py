@@ -296,419 +296,92 @@ class Users:
             return {}
 
 
-class Topics:
+class Planets:
     def __init__(self, db: str) -> None:
-        """
-        The constructor of Topics table class.
-
-        :param db: Represents the name(or path) of the SQLite database
-        :type db_file: str
-        """
         self.__db = db
-        self.setup()
 
     def setup(self) -> None:
         """
-        Creates the topics table in database.
+        Creates the planets table in database.
         """
         self.conn = sqlite3.connect(self.__db)
         cursor = self.conn.cursor()
-        # Create users table
-        sql = """CREATE TABLE IF NOT EXISTS topics (
-        id INTEGER PRIMARY KEY,
-        name TEXT,
-        grade INTEGER
-        )"""
+        sql = '''CREATE TABLE IF NOT EXISTS planets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL UNIQUE,
+            video TEXT,
+            avatar TEXT,
+            image TEXT,
+            desc TEXT
+        )'''
         cursor.execute(sql)
         self.conn.commit()
         self.conn.close()
 
-    def get_all_topics(self) -> list:
+    def add_planet(self, name: str, video: str = '', avatar: str = '', image: str = '', desc: str = '') -> bool:
         """
-        Get all topics from database.
+        Adds a new planet to the database.
 
-        :return: list of topics
+        :param name: Name of the planet
+        :param video: URL or path to video
+        :param avatar: Avatar image path
+        :param image: Main image path
+        :param desc: Description of the planet
+        :return: True if added successfully, else False
         """
-        sql = "SELECT * FROM topics"
+        sql = '''INSERT INTO planets (name, video, avatar, image, desc) VALUES (?, ?, ?, ?, ?)'''
+        params = (name, video, avatar, image, desc)
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql, params)
+            self.conn.commit()
+            self.conn.close()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def get_all_planets(self) -> list[dict]:
+        """
+        Fetches all planets from the database.
+
+        :return: List of planet dictionaries
+        """
+        sql = "SELECT * FROM planets"
         try:
             self.conn = sqlite3.connect(self.__db)
             cursor = self.conn.cursor()
             cursor.execute(sql)
             rows = cursor.fetchall()
+            column_names = [desc[0] for desc in cursor.description]
             self.conn.close()
-            if not rows:
-                return []
-            topics_list = []
-            for row in rows:
-                topic_dict = {'id': row[0], 'name': row[1], 'grade': row[2]}
-                topics_list.append(topic_dict)
-            return topics_list
+            return [dict(zip(column_names, row)) for row in rows]
         except Exception as e:
             print(e)
             return []
 
-    def get_topics_by_grade(self, max_grade: int) -> list[dict]:
+    def get_planet_by_name(self, name: str) -> dict:
         """
-        Reads topics from the db where grade is less or equal to max_grade.
+        Retrieves a planet's information based on its name.
 
-        :param max_grade: Represents the maximum grade of the topics
-        :type max_grade: int
-        :return: list of topics
-        :rtype: list
+        :param name: Name of the planet
+        :return: Dictionary with planet details or empty dict if not found
         """
-        self.conn = sqlite3.connect(self.__db)
-        cursor = self.conn.cursor()
-        cursor.execute("SELECT * FROM topics WHERE grade <= ?", (max_grade,))
-        topics = []
-        for row in cursor.fetchall():
-            topic_dict = {
-                "id": row[0],
-                "name": row[1],
-                "grade": row[2]
-            }
-            topics.append(topic_dict)
-        self.conn.close()
-        return topics
-
-    def add_topic(self, name: str, grade: int):
-        """
-        Inserts a new topic into the db.
-
-        :param name: Represents the name of the topic
-        :type name: str
-        :param grade: Rrepresents the level or grade of the topic
-        :type grade: int
-        :return: The `add_topic` method returns a boolean value,
-        `True` if the topic was added successfully,
-        and `False` if there was an exception during the process.
-        """
-        sql = """INSERT OR IGNORE INTO topics
-        (name, grade)
-        VALUES (?, ?)
-        """
-        param = (name, grade)
+        sql = "SELECT * FROM planets WHERE name = ?"
         try:
             self.conn = sqlite3.connect(self.__db)
             cursor = self.conn.cursor()
-            cursor.execute(sql, param)
-            self.conn.commit()
+            cursor.execute(sql, (name,))
+            row = cursor.fetchone()
             self.conn.close()
-            print("Topic added successfully")
-            return True
+            if row:
+                column_names = [desc[0] for desc in cursor.description]
+                return dict(zip(column_names, row))
+            return {}
         except Exception as e:
             print(e)
-            return False
-
-
-class Questions:
-    def __init__(self, db: str) -> None:
-        """
-        The constructor of Questions table class.
-
-        :param db: Represents the name(or path) of the SQLite database
-        :type db_file: str
-        """
-        self.__db = db
-        self.setup()
-
-    def setup(self) -> None:
-        """
-        Creates the questions table in database.
-        """
-        self.conn = sqlite3.connect(self.__db)
-        cursor = self.conn.cursor()
-        # Create users table
-        sql = """CREATE TABLE IF NOT EXISTS questions (
-        id INTEGER PRIMARY KEY,
-        topic_id INTEGER NOT NULL,
-        question TEXT NOT NULL,
-        option1 TEXT NOT NULL,
-        option2 TEXT NOT NULL,
-        option3 TEXT NOT NULL,
-        option4 TEXT NOT NULL,
-        option5 TEXT DEFAULT "نخوانده ایم",
-        answer INTEGER NOT NULL,
-        FOREIGN KEY (topic_id) REFERENCES topics(id)
-        )"""
-        cursor.execute(sql)
-        self.conn.commit()
-        self.conn.close()
-
-    def add_question(
-            self,
-            topic_id: int,
-            question: str,
-            opt1: str,
-            opt2: str,
-            opt3: str,
-            opt4: str,
-            answer: int
-    ):
-        """
-        Inserts a new question into the db.
-
-        :param topic_id: Represents the id of the topic
-        :type name: int
-        :param question: Rrepresents the question
-        :type question: str
-        :param opt1: Rrepresents the option 1
-        :type opt1: str
-        :param opt2: Rrepresents the option 2
-        :type opt2: str
-        :param opt3: Rrepresents the option 3
-        :type opt3: str
-        :param opt4: Rrepresents the option 4
-        :type opt4: str
-        :param answer: Represents the right answer of question
-        :type name: int
-        :return: The `add_topic` method returns a boolean value,
-        `True` if the topic was added successfully,
-        and `False` if there was an exception during the process.
-        """
-        sql = """INSERT OR IGNORE INTO questions
-        (topic_id, question, option1, option2, option3, option4, answer)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-        """
-        param = (topic_id, question,  opt1, opt2, opt3, opt4, answer)
-        try:
-            self.conn = sqlite3.connect(self.__db)
-            cursor = self.conn.cursor()
-            cursor.execute(sql, param)
-            self.conn.commit()
-            self.conn.close()
-            print("Question added successfully")
-            return True
-        except Exception as e:
-            print(e)
-            return False
-
-    def get_all_questions(self) -> list[dict]:
-        """
-        Reads all questions from the questions table in the database
-        and returns them as a list of dictionaries.
-
-        :return: A list of dictionaries
-        :rtype: list[dict]
-        """
-        self.conn = sqlite3.connect(self.__db)
-        cursor = self.conn.cursor()
-        cursor.execute("SELECT * FROM questions")
-        questions = []
-        for row in cursor.fetchall():
-            question_dict = {
-                "id": row[0],
-                "topic_id": row[1],
-                "question": json.loads(row[2]),
-                "option1": json.loads(row[3]),
-                "option2": json.loads(row[4]),
-                "option3": json.loads(row[5]),
-                "option4": json.loads(row[6]),
-                "option5": row[7],
-                "answer": row[8]
-            }
-            questions.append(question_dict)
-        self.conn.close()
-        return questions
-
-
-class TextBooks:
-    def __init__(self, db: str) -> None:
-        """
-        The constructor of TextBooks table class.
-
-        :param db: Represents the name(or path) of the SQLite database
-        :type db_file: str
-        """
-        self.__db = db
-        self.setup()
-
-    def setup(self) -> None:
-        """
-        Creates the textbooks table in database.
-        """
-        self.conn = sqlite3.connect(self.__db)
-        cursor = self.conn.cursor()
-        # Create users table
-        sql = """CREATE TABLE IF NOT EXISTS textbooks (
-        id INTEGER PRIMARY KEY,
-        topic INTEGER NOT NULL,
-        name TEXT,
-        pdf TEXT,
-        video TEXT,
-        FOREIGN KEY(topic) REFERENCES topics(id)
-        )"""
-        cursor.execute(sql)
-        self.conn.commit()
-        self.conn.close()
-
-    def get_all_textbooks(self) -> list:
-        """
-        Get all textbooks from database.
-
-        :return: list of textbooks
-        """
-        sql = "SELECT * FROM textbooks"
-        try:
-            self.conn = sqlite3.connect(self.__db)
-            cursor = self.conn.cursor()
-            cursor.execute(sql)
-            rows = cursor.fetchall()
-            self.conn.close()
-            if not rows:
-                return []
-            topics_list = []
-            for row in rows:
-                topic_dict = {
-                    'id': row[0],
-                    'topic': row[1],
-                    'name': row[2],
-                    'pdf': row[3],
-                    'video': row[4]
-                }
-                topics_list.append(topic_dict)
-            return topics_list
-        except Exception as e:
-            print(e)
-            return []
-
-    def add_textbook(self, tid: int, name: str, pdf: str, video: str) -> bool:
-        """
-        Inserts a new textbook into the db.
-
-        :param name: Represents the name of the topic
-        :type name: str
-        :param tid: Represents the id of the topic
-        :type tid: int
-        :param pdf: Represents the pdf of the textbook
-        :type pdf: str
-        :param video: Represents the video of the textbook
-        :type video: str
-        :return: The `add_textbook` method returns a boolean value,
-        `True` if the textbook was added successfully,
-        and `False` if there was an exception during the process.
-        """
-        pdf_path = "./static/dars/" + pdf + ".pdf"
-        sql = """INSERT OR IGNORE INTO textbooks
-        (topic, name, pdf, video)
-        VALUES (?, ?, ?, ?)
-        """
-        param = (tid, name, pdf_path, video)
-        try:
-            self.conn = sqlite3.connect(self.__db)
-            cursor = self.conn.cursor()
-            cursor.execute(sql, param)
-            self.conn.commit()
-            self.conn.close()
-            print("Textbook added successfully")
-            return True
-        except Exception as e:
-            print(e)
-            return False
-
-    def get_textbooks_by_topics(self, topic_ids: list) -> list:
-        """
-        Retrieve textbooks based on a list of topic IDs.
-
-        :param topic_ids: List of topic IDs
-        :type topic_ids: list
-        :return: List of textbooks matching the provided topic IDs
-        :rtype: list
-        """
-        self.conn = sqlite3.connect(self.__db)
-        cursor = self.conn.cursor()
-        
-        textbooks_by_topics = {}  # Initialize an empty dictionary to store textbooks by topics
-        
-        for topic_id in topic_ids:
-            sql = "SELECT * FROM textbooks WHERE topic = ?"
-            cursor.execute(sql, (topic_id,))
-            textbooks = cursor.fetchall()
-            textbooks_by_topics[topic_id] = textbooks
-        
-        self.conn.close()
-        return textbooks_by_topics
-
-
-class Results:
-    def __init__(self, db: str) -> None:
-        """
-        The constructor of Result table class.
-        """
-        self.__db = db
-        self.setup()
-
-    def setup(self) -> None:
-        """
-        Creates the result table in database.
-        """
-        self.conn = sqlite3.connect(self.__db)
-        cursor = self.conn.cursor()
-        # Create users table
-        sql = """CREATE TABLE IF NOT EXISTS results (
-        id INTEGER PRIMARY KEY,
-        user_id INTEGER NOT NULL,
-        topic INTEGER NOT NULL,
-        result INTEGER NOT NULL DEFAULT 0,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-        FOREIGN KEY (topic) REFERENCES topics(id)
-        )"""
-        cursor.execute(sql)
-        self.conn.commit()
-        self.conn.close()
-    
-    def add_result(self, user_id, topic, result) -> bool:
-        """
-        Inserts a new result into the db.
-
-        :param user_id: Represents the id of the user
-        :type user_id: int
-        :param topic: Represents the id of the topic
-        :type topic: int
-        :param result: Represents the result of the topic
-        :type result: int
-        :return: The `add_result` method returns a boolean value,
-        `True` if the result was added successfully,
-        and `False` if there was an exception during the process.
-        """
-        sql = """INSERT OR IGNORE INTO results
-        (user_id, topic, result)
-        VALUES (?, ?, ?)
-        """
-        param = (user_id, topic, result)
-        try:
-            self.conn = sqlite3.connect(self.__db)
-            cursor = self.conn.cursor()
-            cursor.execute(sql, param)
-            self.conn.commit()
-            self.conn.close()
-            print("Result added successfully")
-            return True
-        except Exception as e:
-            print(e)
-            return False
-
-    def get_results_by_user_id(self, user_id: int) -> list[dict]:
-        """
-        Reads results from the results table for a specific user_id.
-
-        :param user_id: Represents the id of the user
-        :type user_id: int
-        :return: A list of results dictionaries
-        :rtype: list[dict]
-        """
-        self.conn = sqlite3.connect(self.__db)
-        cursor = self.conn.cursor()
-        cursor.execute("SELECT * FROM results WHERE user_id = ?", (user_id,))
-        results = []
-        for row in cursor.fetchall():
-            result_dict = {
-                "id": row[0],
-                "topic": row[2],
-                "result": row[3]
-            }
-            results.append(result_dict)
-        self.conn.close()
-        return results
+            return {}
 
 
 class DBHelper:
@@ -723,13 +396,11 @@ class DBHelper:
         self.db_file = db_file
         # self.conn = sqlite3.connect(self.db_file)
         self.users = Users(self.db_file)
-        # self.topics = Topics(self.db_file)
-        # self.questions = Questions(self.db_file)
-        # self.textbooks = TextBooks(self.db_file)
-        # self.results = Results(self.db_file)
+        self.planet = Planets(self.db_file)
 
     def create_tables(self):
         self.users.setup()
+        self.planet.setup()
         print("Database and tables created successfully!")
 
 
