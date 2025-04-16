@@ -392,6 +392,8 @@ class UserState:
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             planet_id INTEGER NOT NULL,
+            is_solve_puzzle BOOLEAN DEFAULT 0,
+            is_solve_exam BOOLEAN DEFAULT 0,
             FOREIGN KEY(user_id) REFERENCES users(id),
             FOREIGN KEY(planet_id) REFERENCES planets(id)
         )'''
@@ -399,7 +401,7 @@ class UserState:
         self.conn.commit()
         self.conn.close()
 
-    def add_user_state(self, user_id: int, planet_id: int) -> bool:
+    def add_user_state(self, user_id: int, planet_id: int = 1) -> bool:
         """
         Adds a new user state entry.
 
@@ -439,7 +441,7 @@ class UserState:
             print(e)
             return False
 
-    def get_user_planet(self, user_id: int) -> int:
+    def get_user_planet_id(self, user_id: int) -> int:
         """
         Retrieves the current planet ID of the user.
 
@@ -458,6 +460,85 @@ class UserState:
             print(e)
             return 0
 
+    def get_user_solve_status(self, user_id: int) -> int:
+        """
+        Retrieves the current solve status of the user.
+
+        :param user_id: User's ID
+        :return: Solve status or 0 if not found
+        """
+        sql = "SELECT is_solve_puzzle, is_solve_exam FROM user_state WHERE user_id = ?"
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (user_id,))
+            row = cursor.fetchone()
+            self.conn.close()
+            return row if row else (0, 0)
+        except Exception as e:
+            print(e)
+            return (0, 0)
+
+
+class GiftContent:
+    def __init__(self, db: str) -> None:
+        self.__db = db
+
+    def setup(self) -> None:
+        """
+        Creates the gift_content table in the database.
+        """
+        self.conn = sqlite3.connect(self.__db)
+        cursor = self.conn.cursor()
+        sql = '''CREATE TABLE IF NOT EXISTS gift_content (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            planet_id INTEGER NOT NULL,
+            content TEXT NOT NULL,
+            FOREIGN KEY(planet_id) REFERENCES planets(id)
+        )'''
+        cursor.execute(sql)
+        self.conn.commit()
+        self.conn.close()
+
+    def add_content(self, planet_id: int, content: str) -> bool:
+        """
+        Adds a new content entry for a specific planet.
+
+        :param planet_id: ID of the planet
+        :param content: Text content to be added
+        :return: True if successful
+        """
+        sql = '''INSERT INTO gift_content (planet_id, content) VALUES (?, ?)'''
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (planet_id, content))
+            self.conn.commit()
+            self.conn.close()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def get_contents_by_planet(self, planet_id: int) -> list[str]:
+        """
+        Retrieves all content entries for a given planet.
+
+        :param planet_id: ID of the planet
+        :return: List of content strings
+        """
+        sql = "SELECT content FROM gift_content WHERE planet_id = ?"
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (planet_id,))
+            rows = cursor.fetchall()
+            self.conn.close()
+            return [row[0] for row in rows] if rows else []
+        except Exception as e:
+            print(e)
+            return []
+
 
 class DBHelper:
     def __init__(self, db_file: str = "database.db") -> None:
@@ -473,12 +554,13 @@ class DBHelper:
         self.users = Users(self.db_file)
         self.planet = Planets(self.db_file)
         self.user_state = UserState(self.db_file)
+        self.gift_content = GiftContent(self.db_file)
         
-
     def create_tables(self):
         self.users.setup()
         self.planet.setup()
         self.user_state.setup()
+        self.gift_content.setup()
         print("Database and tables created successfully!")
 
 

@@ -1,6 +1,8 @@
 from flask import flash, redirect, render_template, request, url_for, jsonify
 from flask_login import current_user, login_required, login_user, logout_user
 
+from random import choice
+
 from app import UserManagement, app, bcrypt, db, login_manager
 
 
@@ -72,12 +74,12 @@ def home():
 @login_required
 def galaxy():
     all_planets = db.planet.get_all_planets_basic_info()
-    user_planet_id = db.user_state.get_user_planet(current_user.id)
+    user_planet_id = db.user_state.get_user_planet_id(current_user.id)
     user_planet_info = db.planet.get_planet_by_id(user_planet_id)
     
     for planet in all_planets:
         planet['active'] = planet['name'] == user_planet_info['name']
-    print(all_planets)
+
     planet_info = {
         'name': user_planet_info['name'],
         'desc': user_planet_info['desc'],
@@ -88,21 +90,25 @@ def galaxy():
 
 @app.route('/mission')
 def mission():
-    # TODO: Get is_solve_puzzle from db.
-    is_solve_puzzle = True
-    is_solve_test = False
+    is_solve_puzzle, is_solve_test = db.user_state.get_user_solve_status(current_user.id)
+    current_planet_id = db.user_state.get_user_planet_id(current_user.id)
+    if is_solve_test:
+        db.user_state.update_user_planet(current_user.id, current_planet_id + 1)
+        return redirect(url_for('galaxy'))
     if not is_solve_puzzle:
         return redirect(url_for('puzzle'))
     else:
         return redirect(url_for('exam'))
 
+
 @app.route('/puzzle')
 def puzzle():
-    # TODO: Get is_solve_puzzle from db.
-    is_solve_puzzle = False
+    is_solve_puzzle, _ = db.user_state.get_user_solve_status(current_user.id)
+    current_planet_id = db.user_state.get_user_planet_id(current_user.id)
     if is_solve_puzzle:
         return redirect(url_for('exam'))
-    gift_content = 'اعداد اول یکی از جالب‌ترین موضوعات ریاضی پایه هفتم هستند. این اعداد، فقط دو مقسوم‌علیه دارند: عدد یک و خودشون! مثلاً عدد ۲، ۳، ۵، ۷ و ۱۱ از اولین اعداد اول هستند. چیزی که این اعداد رو خاص می‌کنه، اینه که مثل آجرهای سازنده‌ی همه‌ی اعداد دیگه هستن! یعنی هر عدد طبیعی بزرگ‌تر از ۱ رو می‌تونیم به‌صورت حاصل‌ضرب چند عدد اول بنویسیم. این ویژگی، پایه‌ی مهمی برای رمزنگاری و امنیت دیجیتال در دنیای امروز هم هست! '
+    contents = db.gift_content.get_contents_by_planet(current_planet_id)
+    gift_content = choice(contents) if contents else None
     return render_template('puzzle.html', gift_content=gift_content)
 
 @app.route('/exam')
