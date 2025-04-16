@@ -479,6 +479,46 @@ class UserState:
             print(e)
             return (0, 0)
 
+    def update_user_puzzle_solve_status(self, user_id: int, stat: bool) -> bool:
+        """
+        Updates the puzzle solve status for a given user.
+
+        :param user_id: User's ID
+        :param stat: New puzzle solve status
+        :return: True if successful
+        """
+        sql = "UPDATE user_state SET is_solve_puzzle = ? WHERE user_id = ?"
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (stat, user_id))
+            self.conn.commit()
+            self.conn.close()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def update_user_exam_solve_status(self, user_id: int, stat: bool) -> bool:
+        """
+        Updates the exam solve status for a given user.
+
+        :param user_id: User's ID
+        :param stat: New exam solve status
+        :return: True if successful
+        """
+        sql = "UPDATE user_state SET is_solve_exam = ? WHERE user_id = ?"
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (stat, user_id))
+            self.conn.commit()
+            self.conn.close()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
 
 class GiftContent:
     def __init__(self, db: str) -> None:

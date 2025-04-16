@@ -113,8 +113,8 @@ def puzzle():
 
 @app.route('/exam')
 def exam():
+    db.user_state.update_user_exam_solve_status(current_user.id, True)
     # TODO: Get user money and questions from db.
-    # TODO: Update is_solve_puzzle from db.
     money = 10
     questions = [
         {"question": "حاصل عبارت ۳ + ۵ × ۲ کدام است؟", "options": ["۱۶", "۱۳", "۱۰", "۸"]},
