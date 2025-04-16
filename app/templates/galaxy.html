@@ -18,7 +18,11 @@
         <div class="row match__result-wrapper justify-content-center">
             <div class="d-flex justify-content-center gap-3 flex-wrap">
                 {% for planet in planets_list %}
-                <a href="#"><img alt="{{ planet['name'] }}" class="img-fluid rounded fade-img" src="{{ url_for('static', filename=planet['avatar']) }}" /></a>
+                    {% if planet.active %}
+                    <a href="#"><img alt="{{ planet['name'] }}" class="img-fluid rounded" src="{{ url_for('static', filename=planet['avatar']) }}" /></a>
+                    {% else %}
+                    <a href="#"><img alt="{{ planet['name'] }}" class="img-fluid rounded fade-img" src="{{ url_for('static', filename=planet['avatar']) }}" /></a>
+                    {% endif %}
                 {% endfor %}
             </div>
             
@@ -33,7 +37,7 @@
                 <div class="col-xl-6 col-lg-6 order-0 order-lg-2">
                     <div class="about__funFact-images">
                         <img alt="background" class="bg-shape" src="{{ url_for('static', filename='img/others/fun_fact_shape.png') }}" />
-                        <img alt="image" class="main-img" src="{{ url_for('static', filename='img/galaxy/' + planet_info['img']) }}" />
+                        <img alt="image" class="main-img" src="{{ url_for('static', filename=planet_info['img']) }}" />
                     </div>
                 </div>
                 <div class="col-xl-6 col-lg-6 col-md-10">

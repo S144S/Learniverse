@@ -333,6 +333,28 @@ class Planets:
             print(e)
             return []
 
+    def get_planet_by_id(self, id: int) -> dict:
+        """
+        Retrieves a planet's information based on its id.
+
+        :param id: id of the planet
+        :return: Dictionary with planet details or empty dict if not found
+        """
+        sql = "SELECT * FROM planets WHERE id = ?"
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (id,))
+            row = cursor.fetchone()
+            self.conn.close()
+            if row:
+                column_names = [desc[0] for desc in cursor.description]
+                return dict(zip(column_names, row))
+            return {}
+        except Exception as e:
+            print(e)
+            return {}
+
     def get_planet_by_name(self, name: str) -> dict:
         """
         Retrieves a planet's information based on its name.
