@@ -24,6 +24,7 @@ def register():
         # Hash password
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         done = db.users.add_user(username, hashed_password, fname, lname, int(grade))
+        done = db.user_state.add_user_state(db.users.get_user_id(username), 1)
         if done:
             flash("ثبت‌نام با موفقیت انجام شد!", "success")
             return redirect(url_for('login'))
@@ -70,6 +71,9 @@ def home():
 @app.route('/my-galaxy')
 @login_required
 def galaxy():
+    all_planets = db.planet.get_all_planets_basic_info()
+
+    print(all_planets)
     # TODO: Get below items from db.
     current_planet_name = 'زمین'
     current_planet_desc = 'زمین همون جاییه که توش زندگی می‌کنیم، سیاره‌ای پر از دریاها، کوه‌ها و جنگل‌های سرسبز که هوای مناسب برای نفس کشیدن داره. اینجا خونه‌ی میلیون‌ها موجود زنده‌ست، از ریزترین باکتری‌ها گرفته تا بزرگ‌ترین نهنگ‌ها. آدم‌ها روی زمین شهر ساختن، تکنولوژی پیشرفت دادن و مدام دارن رازهای جدیدی درباره‌ش کشف می‌کنن. با اینکه خیلی چیزا رو درباره‌ش می‌دونیم، ولی هنوز کلی ماجراجویی و کشف جدید تو دل این سیاره منتظر ماست!'
@@ -84,7 +88,7 @@ def galaxy():
         'video': current_planet_video,
         'img': current_planet_img
     }
-    return render_template('galaxy.html', planet_info=planet_info)
+    return render_template('galaxy.html', planets_list=reversed(all_planets), planet_info=planet_info)
 
 @app.route('/mission')
 def mission():

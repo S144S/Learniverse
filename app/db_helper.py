@@ -201,53 +201,6 @@ class Users:
             print(e)
             return False
 
-    def update_user_tries(self, tries, id) -> bool:
-        """
-        Update a user tries.
-
-        :param id: The ID of the user to update
-        :type id: int
-        :param tries: The number of tries
-        :type tries: int
-        :return: a boolean that indicate success.
-        """
-        sql = "UPDATE users SET tries = ? WHERE id = ?"
-        params = (tries, id)
-        try:
-            self.conn = sqlite3.connect(self.__db)
-            cursor = self.conn.cursor()
-            cursor.execute(sql, params)
-            self.conn.commit()
-            self.conn.close()
-            return True
-        except Exception as e:
-            print(e)
-            return False
-
-    def update_user_trees(self, trees: int, id: int):
-        """
-        Update a user trees in the database based on user ID.
-
-        :param trees: The number of trees
-        :type trees: int
-        :param id: The ID of the user to update
-        :type id: int
-        :return: a boolean that includes
-        the status of updating the user's trees.
-        """
-        sql = "UPDATE users SET trees = ? WHERE id = ?"
-        params = (trees, id)
-        try:
-            self.conn = sqlite3.connect(self.__db)
-            cursor = self.conn.cursor()
-            cursor.execute(sql, params)
-            self.conn.commit()
-            self.conn.close()
-            return True
-        except Exception as e:
-            print(e)
-            return False
-
     def get_user_id(self, username: str) -> int:
         """
         Get a user's id from db.
@@ -361,6 +314,25 @@ class Planets:
             print(e)
             return []
 
+    def get_all_planets_basic_info(self) -> list[dict]:
+        """
+        Fetches all planets basic info from the database.
+
+        :return: List of planet dictionaries
+        """
+        sql = "SELECT name, avatar FROM planets"
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql)
+            rows = cursor.fetchall()
+            column_names = [desc[0] for desc in cursor.description]
+            self.conn.close()
+            return [dict(zip(column_names, row)) for row in rows]
+        except Exception as e:
+            print(e)
+            return []
+
     def get_planet_by_name(self, name: str) -> dict:
         """
         Retrieves a planet's information based on its name.
@@ -384,6 +356,87 @@ class Planets:
             return {}
 
 
+class UserState:
+    def __init__(self, db: str) -> None:
+        self.__db = db
+
+    def setup(self) -> None:
+        """
+        Creates the user_state table in the database.
+        """
+        self.conn = sqlite3.connect(self.__db)
+        cursor = self.conn.cursor()
+        sql = '''CREATE TABLE IF NOT EXISTS user_state (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            planet_id INTEGER NOT NULL,
+            FOREIGN KEY(user_id) REFERENCES users(id),
+            FOREIGN KEY(planet_id) REFERENCES planets(id)
+        )'''
+        cursor.execute(sql)
+        self.conn.commit()
+        self.conn.close()
+
+    def add_user_state(self, user_id: int, planet_id: int) -> bool:
+        """
+        Adds a new user state entry.
+
+        :param user_id: User's ID
+        :param planet_id: Planet's ID
+        :return: True if successful
+        """
+        sql = '''INSERT INTO user_state (user_id, planet_id) VALUES (?, ?)'''
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (user_id, planet_id))
+            self.conn.commit()
+            self.conn.close()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def update_user_planet(self, user_id: int, planet_id: int) -> bool:
+        """
+        Updates the planet_id for a given user.
+
+        :param user_id: User's ID
+        :param planet_id: New planet ID
+        :return: True if successful
+        """
+        sql = "UPDATE user_state SET planet_id = ? WHERE user_id = ?"
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (planet_id, user_id))
+            self.conn.commit()
+            self.conn.close()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def get_user_planet(self, user_id: int) -> int:
+        """
+        Retrieves the current planet ID of the user.
+
+        :param user_id: User's ID
+        :return: Planet ID or 0 if not found
+        """
+        sql = "SELECT planet_id FROM user_state WHERE user_id = ?"
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (user_id,))
+            row = cursor.fetchone()
+            self.conn.close()
+            return row[0] if row else 0
+        except Exception as e:
+            print(e)
+            return 0
+
+
 class DBHelper:
     def __init__(self, db_file: str = "database.db") -> None:
         """
@@ -394,13 +447,16 @@ class DBHelper:
         :type db_file: str (optional)
         """
         self.db_file = db_file
-        # self.conn = sqlite3.connect(self.db_file)
+
         self.users = Users(self.db_file)
         self.planet = Planets(self.db_file)
+        self.user_state = UserState(self.db_file)
+        
 
     def create_tables(self):
         self.users.setup()
         self.planet.setup()
+        self.user_state.setup()
         print("Database and tables created successfully!")
 
 

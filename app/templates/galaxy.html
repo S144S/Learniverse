@@ -17,10 +17,9 @@
         </div>
         <div class="row match__result-wrapper justify-content-center">
             <div class="d-flex justify-content-center gap-3 flex-wrap">
-                <a href="#"><img alt="img" class="img-fluid rounded fade-img" src="{{ url_for('static', filename='img/galaxy/sun.png') }}" /></a>
-                <a href="#"><img alt="img" class="img-fluid rounded fade-img" src="{{ url_for('static', filename='img/galaxy/mercury.png') }}" /></a>
-                <a href="#"><img alt="img" class="img-fluid rounded fade-img" src="{{ url_for('static', filename='img/galaxy/venus.png') }}" /></a>
-                <a href="#"><img alt="img" class="img-fluid rounded" src="{{ url_for('static', filename='img/galaxy/earth.png') }}" /></a>
+                {% for planet in planets_list %}
+                <a href="#"><img alt="{{ planet['name'] }}" class="img-fluid rounded fade-img" src="{{ url_for('static', filename=planet['avatar']) }}" /></a>
+                {% endfor %}
             </div>
             
         </div>
