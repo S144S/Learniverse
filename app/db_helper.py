@@ -832,6 +832,7 @@ class DBHelper:
         self.user_state = UserState(self.db_file)
         self.gift_content = GiftContent(self.db_file)
         self.exam = Exam(self.db_file)
+        self.rocket = UserRocket(self.db_file)
         
     def create_tables(self):
         self.users.setup()
@@ -839,6 +840,7 @@ class DBHelper:
         self.user_state.setup()
         self.gift_content.setup()
         self.exam.setup()
+        self.rocket.setup()
         print("Database and tables created successfully!")
 
 

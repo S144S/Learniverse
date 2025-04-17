@@ -26,7 +26,9 @@ def register():
         # Hash password
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         done = db.users.add_user(username, hashed_password, fname, lname, int(grade))
-        done = db.user_state.add_user_state(db.users.get_user_id(username), 1)
+        done = db.rocket.add_user_rocket(user_id=db.users.get_user_id(username))
+        done = db.user_state.add_user_state(user_id=db.users.get_user_id(username), planet_id=1)
+
         if done:
             flash("ثبت‌نام با موفقیت انجام شد!", "success")
             return redirect(url_for('login'))
@@ -119,7 +121,7 @@ def exam():
     db.user_state.update_user_exam_solve_status(current_user.id, True)
     current_planet_id = db.user_state.get_user_planet_id(current_user.id)
     questions = db.exam.get_exam_questions(current_planet_id)
-    money = 10
+    money = db.rocket.get_user_money(current_user.id)
     return render_template('exam.html', questions=questions, money=money)
 
 @app.route('/check_exam', methods=['POST'])
@@ -134,11 +136,13 @@ def check_exam():
 @app.route('/my-rocket')
 def my_rocket():
     # TODO: Get below items from db.
-    money = 350
-    cold_trip = False
-    atomic_fuel = False
-    flying_motor = False
-    titanium_body = True
+    user_id = current_user.id
+    money = db.rocket.get_user_money(user_id)
+    rocket_abilities = db.rocket.get_user_rocket_features(user_id)
+    cold_trip = rocket_abilities.get('cold_trip', False)
+    atomic_fuel = rocket_abilities.get('atomic_fuel', False)
+    flying_motor = rocket_abilities.get('flying_motor', False)
+    titanium_body = rocket_abilities.get('titanium_body', True)
     return render_template(
         'my_rocket.html',
         money=money,
@@ -155,15 +159,28 @@ def store():
 
 @app.route('/purchase', methods=['POST'])
 def purchase():
+    user_id = current_user.id
     # TODO: Get user money from db.
-    money = 100
+    money = db.rocket.get_user_money(user_id)
     data = request.json
     item = data.get('item')
     cost = int(data.get('cost', 0))
-    # TODO: Update is_cold_trip, etc on db.
+    print(item == "ُسفر در سرما")
+    print(item == "بدنه تیتانیومی")
+    print(item == "موتور پرنده")
+    print(item == "سوخت اتمی")
 
     if money >= cost:
         money -= cost
+        if item == "سفر در سرما":
+            db.rocket.update_rocket_feature(user_id, "cold_trip", True)
+        if item == "سوخت اتمی":
+            db.rocket.update_rocket_feature(user_id, "atomic_fuel", True)
+        if item == "موتور پرنده":
+            db.rocket.update_rocket_feature(user_id, "flying_motor", True)
+        if item == "بدنه تیتانیومی":
+            db.rocket.update_rocket_feature(user_id, "titanium_body", True)
+        db.rocket.update_user_money(user_id, money)
         return jsonify({'success': True, 'message': f'قابلیت {item} به سفینت اضافه شد، میتونی بعد از بستن این پیام از منوی بالا بری سفینت رو ببینی!'})
     else:
         return jsonify({'success': False, 'message': 'سکه کافی نداری! ❌'})
