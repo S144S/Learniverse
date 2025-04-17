@@ -519,7 +519,6 @@ class UserState:
             print(e)
             return False
 
-
 class GiftContent:
     def __init__(self, db: str) -> None:
         self.__db = db
@@ -580,6 +579,131 @@ class GiftContent:
             return []
 
 
+class Exam:
+    def __init__(self, db: str) -> None:
+        self.__db = db
+
+    def setup(self) -> None:
+        """
+        Creates the exam table in the database.
+        """
+        self.conn = sqlite3.connect(self.__db)
+        cursor = self.conn.cursor()
+        sql = '''CREATE TABLE IF NOT EXISTS exam (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            planet_id INTEGER NOT NULL,
+            q1 TEXT, q1_options TEXT, q1_right_answer INTEGER,
+            q2 TEXT, q2_options TEXT, q2_right_answer INTEGER,
+            q3 TEXT, q3_options TEXT, q3_right_answer INTEGER,
+            q4 TEXT, q4_options TEXT, q4_right_answer INTEGER,
+            q5 TEXT, q5_options TEXT, q5_right_answer INTEGER,
+            q6 TEXT, q6_options TEXT, q6_right_answer INTEGER,
+            q7 TEXT, q7_options TEXT, q7_right_answer INTEGER,
+            q8 TEXT, q8_options TEXT, q8_right_answer INTEGER,
+            q9 TEXT, q9_options TEXT, q9_right_answer INTEGER,
+            q10 TEXT, q10_options TEXT, q10_right_answer INTEGER,
+            FOREIGN KEY(planet_id) REFERENCES planets(id)
+        )'''
+        cursor.execute(sql)
+        self.conn.commit()
+        self.conn.close()
+
+    def add_exam(self, planet_id: int, questions: list[dict], correct_answers: dict) -> bool:
+        """
+        Adds a full 10-question exam for a given planet.
+
+        :param planet_id: ID of the planet
+        :param questions: List of 10 dicts with keys: question, options
+        :param correct_answers: Dict of question index to correct option index (1-based)
+        :return: True if successful
+        """
+        if len(questions) != 10:
+            raise ValueError("Exactly 10 questions are required.")
+
+        sql = '''INSERT INTO exam (
+            planet_id,
+            q1, q1_options, q1_right_answer,
+            q2, q2_options, q2_right_answer,
+            q3, q3_options, q3_right_answer,
+            q4, q4_options, q4_right_answer,
+            q5, q5_options, q5_right_answer,
+            q6, q6_options, q6_right_answer,
+            q7, q7_options, q7_right_answer,
+            q8, q8_options, q8_right_answer,
+            q9, q9_options, q9_right_answer,
+            q10, q10_options, q10_right_answer
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
+
+        params = [planet_id]
+        for i in range(10):
+            q = questions[i]
+            options_json = json.dumps(q['options'], ensure_ascii=False)
+            params.extend([q['question'], options_json, correct_answers[f"q{i+1}"]])
+
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql, params)
+            self.conn.commit()
+            self.conn.close()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def get_exam_questions(self, planet_id: int) -> list[dict]:
+        """
+        Returns the list of questions and options for a given planet.
+
+        :param planet_id: ID of the planet
+        :return: List of dicts with keys 'question' and 'options'
+        """
+        sql = "SELECT * FROM exam WHERE planet_id = ?"
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (planet_id,))
+            row = cursor.fetchone()
+            self.conn.close()
+
+            if not row:
+                return []
+
+            questions = []
+            for i in range(1, 11):
+                question = row[i * 3 - 2]  # q1, q2, ..., q10
+                options = json.loads(row[i * 3 - 1])  # q1_options, ...
+                questions.append({"question": question, "options": options})
+
+            return questions
+        except Exception as e:
+            print(e)
+            return []
+
+    def get_correct_answers(self, planet_id: int) -> dict:
+        """
+        Returns the correct answers for the exam of a given planet.
+
+        :param planet_id: ID of the planet
+        :return: Dict of question number to correct option index (1-based)
+        """
+        sql = "SELECT * FROM exam WHERE planet_id = ?"
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (planet_id,))
+            row = cursor.fetchone()
+            self.conn.close()
+
+            if not row:
+                return {}
+
+            return {f"q{i}": row[i * 3] for i in range(1, 11)}
+        except Exception as e:
+            print(e)
+            return {}
+
+
 class DBHelper:
     def __init__(self, db_file: str = "database.db") -> None:
         """
@@ -595,12 +719,14 @@ class DBHelper:
         self.planet = Planets(self.db_file)
         self.user_state = UserState(self.db_file)
         self.gift_content = GiftContent(self.db_file)
+        self.exam = Exam(self.db_file)
         
     def create_tables(self):
         self.users.setup()
         self.planet.setup()
         self.user_state.setup()
         self.gift_content.setup()
+        self.exam.setup()
         print("Database and tables created successfully!")
 
 
