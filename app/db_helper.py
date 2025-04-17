@@ -652,12 +652,6 @@ class Exam:
             return False
 
     def get_exam_questions(self, planet_id: int) -> list[dict]:
-        """
-        Returns the list of questions and options for a given planet.
-
-        :param planet_id: ID of the planet
-        :return: List of dicts with keys 'question' and 'options'
-        """
         sql = "SELECT * FROM exam WHERE planet_id = ?"
         try:
             self.conn = sqlite3.connect(self.__db)
@@ -671,22 +665,21 @@ class Exam:
 
             questions = []
             for i in range(1, 11):
-                question = row[i * 3 - 2]  # q1, q2, ..., q10
-                options = json.loads(row[i * 3 - 1])  # q1_options, ...
+                base = 2 + (i - 1) * 3
+                question = row[base]
+                try:
+                    options = json.loads(row[base + 1]) if row[base + 1] else []
+                except Exception as e:
+                    print(f"Error parsing question {i}: {e}")
+                    options = []
                 questions.append({"question": question, "options": options})
 
             return questions
         except Exception as e:
-            print(e)
+            print("Error getting questions ->", e)
             return []
 
     def get_correct_answers(self, planet_id: int) -> dict:
-        """
-        Returns the correct answers for the exam of a given planet.
-
-        :param planet_id: ID of the planet
-        :return: Dict of question number to correct option index (1-based)
-        """
         sql = "SELECT * FROM exam WHERE planet_id = ?"
         try:
             self.conn = sqlite3.connect(self.__db)
@@ -698,9 +691,9 @@ class Exam:
             if not row:
                 return {}
 
-            return {f"q{i}": row[i * 3] for i in range(1, 11)}
+            return {f"q{i}": row[2 + (i - 1) * 3 + 2] for i in range(1, 11)}
         except Exception as e:
-            print(e)
+            print("Error getting correct answers ->", e)
             return {}
 
 

@@ -89,6 +89,7 @@ def galaxy():
     return render_template('galaxy.html', planets_list=reversed(all_planets), planet_info=planet_info)
 
 @app.route('/mission')
+@login_required
 def mission():
     is_solve_puzzle, is_solve_test = db.user_state.get_user_solve_status(current_user.id)
     current_planet_id = db.user_state.get_user_planet_id(current_user.id)
@@ -102,6 +103,7 @@ def mission():
 
 
 @app.route('/puzzle')
+@login_required
 def puzzle():
     is_solve_puzzle, _ = db.user_state.get_user_solve_status(current_user.id)
     current_planet_id = db.user_state.get_user_planet_id(current_user.id)
@@ -112,31 +114,18 @@ def puzzle():
     return render_template('puzzle.html', gift_content=gift_content)
 
 @app.route('/exam')
+@login_required
 def exam():
     db.user_state.update_user_exam_solve_status(current_user.id, True)
-    # TODO: Get user money and questions from db.
+    current_planet_id = db.user_state.get_user_planet_id(current_user.id)
+    questions = db.exam.get_exam_questions(current_planet_id)
     money = 10
-    questions = [
-        {"question": "حاصل عبارت ۳ + ۵ × ۲ کدام است؟", "options": ["۱۶", "۱۳", "۱۰", "۸"]},
-        {"question": "کدام یک عدد اول است؟", "options": ["۱۵", "۲۳", "۲۷", "۳۹"]},
-        {"question": "چه عددی هم مضرب ۳ است و هم مضرب ۴؟", "options": ["۱۲", "۱۵", "۱۸", "۲۴"]},
-        {"question": "کدام گزینه مقدار عددی کسر ۳/۴ را به درستی نمایش می‌دهد؟", "options": ["۰.۲۵", "۰.۵", "۰.۷۵", "۱"]},
-        {"question": "مساحت یک مربع با ضلع ۶ سانتی‌متر چقدر است؟", "options": ["۱۲", "۱۸", "۲۴", "۳۶"]},
-        {"question": "چه عددی بین ۲۵ و ۳۵، مضرب ۵ است؟", "options": ["۲۶", "۲۷", "۳۰", "۳۳"]},
-        {"question": "حاصل تفریق ۸۵ از ۱۲۳ چیست؟", "options": ["۳۸", "۴۸", "۵۸", "۶۸"]},
-        {"question": "زاویه قائمه چند درجه است؟", "options": ["۴۵", "۶۰", "۹۰", "۱۸۰"]},
-        {"question": "کدام گزینه برابر با ۴۵٪ از ۲۰۰ است؟", "options": ["۷۰", "۸۰", "۹۰", "۱۰۰"]},
-        {"question": "اگر محیط یک مستطیل ۲۰ سانتی‌متر و طول آن ۶ سانتی‌متر باشد، عرض آن چقدر است؟", "options": ["۲", "۴", "۵", "۶"]},
-    ]
     return render_template('exam.html', questions=questions, money=money)
 
 @app.route('/check_exam', methods=['POST'])
 def check_exam():
-    # TODO: Get right answers from db.
-    correct_answers = {
-        "q1": 1, "q2": 3, "q3": 2, "q4": 4, "q5": 1,
-        "q6": 2, "q7": 3, "q8": 1, "q9": 4, "q10": 2
-    }
+    current_planet_id = db.user_state.get_user_planet_id(current_user.id)
+    correct_answers = db.exam.get_correct_answers(current_planet_id)
     data = request.json  # Get submitted answers from frontend
     score = sum(1 for q, ans in data.items() if correct_answers.get(q) == int(ans))
     
