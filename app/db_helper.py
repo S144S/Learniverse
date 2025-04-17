@@ -697,6 +697,125 @@ class Exam:
             return {}
 
 
+class UserRocket:
+    def __init__(self, db: str) -> None:
+        self.__db = db
+
+    def setup(self) -> None:
+        """
+        Creates the user_rocket table in the database.
+        """
+        self.conn = sqlite3.connect(self.__db)
+        cursor = self.conn.cursor()
+        sql = '''CREATE TABLE IF NOT EXISTS user_rocket (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL UNIQUE,
+            money INTEGER DEFAULT 50,
+            cold_trip BOOLEAN DEFAULT 0,
+            atomic_fuel BOOLEAN DEFAULT 0,
+            flying_motor BOOLEAN DEFAULT 0,
+            titanium_body BOOLEAN DEFAULT 0,
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        )'''
+        cursor.execute(sql)
+        self.conn.commit()
+        self.conn.close()
+
+    def add_user_rocket(self, user_id: int) -> bool:
+        """
+        Adds a new rocket entry for a user.
+        """
+        sql = '''INSERT OR IGNORE INTO user_rocket (user_id) VALUES (?)'''
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (user_id,))
+            self.conn.commit()
+            self.conn.close()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def get_user_money(self, user_id: int) -> int:
+        """
+        Retrieves the current money of a user.
+        """
+        sql = "SELECT money FROM user_rocket WHERE user_id = ?"
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (user_id,))
+            row = cursor.fetchone()
+            self.conn.close()
+            return row[0] if row else 0
+        except Exception as e:
+            print(e)
+            return 0
+
+    def update_user_money(self, user_id: int, new_money: int) -> bool:
+        """
+        Updates the money of a user.
+        """
+        sql = "UPDATE user_rocket SET money = ? WHERE user_id = ?"
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (new_money, user_id))
+            self.conn.commit()
+            self.conn.close()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def get_user_rocket_features(self, user_id: int) -> dict:
+        """
+        Returns a dictionary of all rocket features for the given user.
+        """
+        sql = '''SELECT cold_trip, atomic_fuel, flying_motor, titanium_body
+                 FROM user_rocket WHERE user_id = ?'''
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (user_id,))
+            row = cursor.fetchone()
+            self.conn.close()
+            if row:
+                keys = ["cold_trip", "atomic_fuel", "flying_motor", "titanium_body"]
+                return dict(zip(keys, row))
+            return {}
+        except Exception as e:
+            print(e)
+            return {}
+
+    def update_rocket_feature(self, user_id: int, feature: str, value: bool) -> bool:
+        """
+        Updates a specific rocket feature for the user.
+
+        :param user_id: ID of the user
+        :param feature: Name of the feature to update (must be one of the valid columns)
+        :param value: Boolean value (True/False)
+        :return: True if successful
+        """
+        valid_features = ["cold_trip", "atomic_fuel", "flying_motor", "titanium_body"]
+        if feature not in valid_features:
+            print(f"Invalid feature: {feature}")
+            return False
+
+        sql = f"UPDATE user_rocket SET {feature} = ? WHERE user_id = ?"
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (int(value), user_id))
+            self.conn.commit()
+            self.conn.close()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+
 class DBHelper:
     def __init__(self, db_file: str = "database.db") -> None:
         """
