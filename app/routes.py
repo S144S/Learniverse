@@ -1,7 +1,7 @@
-from flask import flash, redirect, render_template, request, url_for, jsonify
-from flask_login import current_user, login_required, login_user, logout_user
-
 from random import choice
+
+from flask import flash, jsonify, redirect, render_template, request, url_for
+from flask_login import current_user, login_required, login_user, logout_user
 
 from app import UserManagement, app, bcrypt, db, login_manager
 
@@ -130,6 +130,10 @@ def check_exam():
     correct_answers = db.exam.get_correct_answers(current_planet_id)
     data = request.json  # Get submitted answers from frontend
     score = sum(1 for q, ans in data.items() if correct_answers.get(q) == int(ans))
+    if score > 9:
+        money = db.rocket.get_user_money(current_user.id)
+        db.rocket.update_user_money(current_user.id, money + 50)
+        db.user_state.update_user_planet(current_user.id, current_planet_id + 1)
     
     return jsonify({"score": score})
 
@@ -160,15 +164,10 @@ def store():
 @app.route('/purchase', methods=['POST'])
 def purchase():
     user_id = current_user.id
-    # TODO: Get user money from db.
     money = db.rocket.get_user_money(user_id)
     data = request.json
     item = data.get('item')
     cost = int(data.get('cost', 0))
-    print(item == "ُسفر در سرما")
-    print(item == "بدنه تیتانیومی")
-    print(item == "موتور پرنده")
-    print(item == "سوخت اتمی")
 
     if money >= cost:
         money -= cost

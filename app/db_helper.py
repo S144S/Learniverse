@@ -519,6 +519,7 @@ class UserState:
             print(e)
             return False
 
+
 class GiftContent:
     def __init__(self, db: str) -> None:
         self.__db = db
