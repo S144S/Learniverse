@@ -603,6 +603,7 @@ class Exam:
             q8 TEXT, q8_options TEXT, q8_right_answer INTEGER,
             q9 TEXT, q9_options TEXT, q9_right_answer INTEGER,
             q10 TEXT, q10_options TEXT, q10_right_answer INTEGER,
+            teach_note TEXT DEFAULT NULL,
             FOREIGN KEY(planet_id) REFERENCES planets(id)
         )'''
         cursor.execute(sql)
@@ -645,6 +646,19 @@ class Exam:
             self.conn = sqlite3.connect(self.__db)
             cursor = self.conn.cursor()
             cursor.execute(sql, params)
+            self.conn.commit()
+            self.conn.close()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def add_teach_note(self, planet_id: int, address: str) -> bool:
+        sql = '''UPDATE exam SET teach_note = ? WHERE planet_id = ?'''
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (address, planet_id))
             self.conn.commit()
             self.conn.close()
             return True
@@ -696,6 +710,19 @@ class Exam:
         except Exception as e:
             print("Error getting correct answers ->", e)
             return {}
+
+    def get_teach_note(self, planet_id: int) -> str:
+        sql = "SELECT teach_note FROM exam WHERE planet_id = ?"
+        try:
+            self.conn = sqlite3.connect(self.__db)
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (planet_id,))
+            row = cursor.fetchone()
+            self.conn.close()
+            return row[0] if row else ""
+        except Exception as e:
+            print("Error getting teach note ->", e)
+            return ""
 
 
 class UserRocket:
