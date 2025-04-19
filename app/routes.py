@@ -96,7 +96,10 @@ def mission():
     is_solve_puzzle, is_solve_test = db.user_state.get_user_solve_status(current_user.id)
     current_planet_id = db.user_state.get_user_planet_id(current_user.id)
     if is_solve_test:
-        db.user_state.update_user_planet(current_user.id, current_planet_id + 1)
+        next_planet = current_planet_id + 1
+        if next_planet > 4:
+            next_planet = 4
+        db.user_state.update_user_planet(current_user.id, next_planet)
         return redirect(url_for('galaxy'))
     if not is_solve_puzzle:
         return redirect(url_for('puzzle'))
@@ -118,7 +121,7 @@ def puzzle():
 @app.route('/exam')
 @login_required
 def exam():
-    db.user_state.update_user_exam_solve_status(current_user.id, True)
+    db.user_state.update_user_puzzle_solve_status(current_user.id, True)
     current_planet_id = db.user_state.get_user_planet_id(current_user.id)
     questions = db.exam.get_exam_questions(current_planet_id)
     money = db.rocket.get_user_money(current_user.id)
@@ -133,7 +136,11 @@ def check_exam():
     if score > 9:
         money = db.rocket.get_user_money(current_user.id)
         db.rocket.update_user_money(current_user.id, money + 50)
-        db.user_state.update_user_planet(current_user.id, current_planet_id + 1)
+        db.user_state.update_user_puzzle_solve_status(current_user.id, False)
+        next_planet = current_planet_id + 1
+        if next_planet > 4:
+            next_planet = 4
+        db.user_state.update_user_planet(current_user.id, next_planet)
     
     return jsonify({"score": score})
 
